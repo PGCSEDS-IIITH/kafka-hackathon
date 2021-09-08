@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+      - "2181:2181"
+  
+  kafka:
+    image: wurstmeister/kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_CREATE_TOPICS: "tweets:1:1"
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    depends_on: 
+      - zookeeper
+
+  producer:
+    build: .
+    environment: 
+      BROKER: kafka:9092
+    command: sh -c "sleep 5 && python send_data.py"
+    depends_on: 
+      - kafka
+  
+  consumer:
+    build: .
+    environment: 
+      BROKER: kafka:9092
+    command: sh -c "sleep 5 && python consumer.py"
+    depends_on: 
+      - kafka
+      - producer
