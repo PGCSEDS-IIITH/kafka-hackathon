@@ -11,7 +11,7 @@ import os
 BROKER = os.getenv('BROKER', 'localhost:9092')                                                                                               
 TOPIC = 'tweets'                                                                                                      
                                                                                                                         
-WORD_FILE = '/usr/share/dict/words'                                                                                     
+WORD_FILE = 'models/words'                                                                                     
 WORDS = open(WORD_FILE).read().splitlines()                                                                             
                                                                                                                         
 try:                                                                                                                    

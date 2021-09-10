@@ -17,19 +17,38 @@ services:
     depends_on: 
       - zookeeper
 
+  spark-master:
+    image: bde2020/spark-master:3.1.1-hadoop3.2
+    ports:
+      - "8080:8080"
+      - "7077:7077"
+    environment:
+      - INIT_DAEMON_STEP=setup_spark
+  
+  spark-worker:
+    image: bde2020/spark-worker:3.1.1-hadoop3.2
+    depends_on:
+      - spark-master
+    ports:
+      - "8081:8081"
+    environment:
+      - "SPARK_MASTER=spark://spark-master:7077"
+
   producer:
     build: .
     environment: 
       BROKER: kafka:9092
-    command: sh -c "sleep 5 && python send_data.py"
+    command: sh -c "spark-submit --master spark://spark-master:7077 send_data.py"
     depends_on: 
+      - spark-master
       - kafka
   
   consumer:
     build: .
     environment: 
       BROKER: kafka:9092
-    command: sh -c "sleep 5 && python consumer.py"
-    depends_on: 
+    command: "spark-submit --master spark://spark-master:7077 consumer.py "
+    depends_on:
+      - spark-master
       - kafka
       - producer

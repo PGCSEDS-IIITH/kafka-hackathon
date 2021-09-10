@@ -4,9 +4,10 @@ WORKDIR /app
 ENV PYTHONUNBUFFERED 1
 ENV DISPLAY=:99
 
-# Install apt requirements
+RUN mkdir -p /usr/share/man/man1
+
 RUN apt update
-RUN apt install -y wbritish
+RUN apt install default-jdk scala git -y
 
 # Install requirements
 COPY requirements.txt requirements.txt
